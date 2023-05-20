@@ -5,9 +5,9 @@ const bodyParser = require("body-parser");
 const ejs = require("ejs");
 const mongoose = require('mongoose');
 const encrypt = require("mongoose-encryption");
-//const md5 = require("md5");
-//const bcrypt = require("bcrypt");
-//const saltRounds = 10 ; 
+const md5 = require("md5");
+const bcrypt = require("bcrypt");
+const saltRounds = 10 ; 
 
 const app = express();
 
@@ -20,6 +20,9 @@ app.use(bodyParser.urlencoded({
 app.use(express.static("public"));
 
 mongoose.connect("mongodb://localhost:27017/wikiDB");
+
+
+
 
 
 
