@@ -69,6 +69,13 @@ app.post('/login', function(req,res){
 });
 
 app.post('/register', function(req , res ){
+    // check if the passport already exist
+    const { username, password } = req.body;
+    const existingUser = users.findOne({ username});
+    if (existingUser) {
+      return res.status(400).json({ message: 'user already registered' });
+    }
+    // register new user 
    users.register({username : req.body.username} , req.body.password , function(err ,user ){
     if (err){
       console.log(err)
@@ -82,6 +89,7 @@ app.post('/register', function(req , res ){
    }) 
       
 });
+
 
 
 
