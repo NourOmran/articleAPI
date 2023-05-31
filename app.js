@@ -28,11 +28,17 @@ app.use(passport.session());
 
 mongoose.connect("mongodb://localhost:27017/wikiDB");
 
-
-const articleSchema = { 
-    title: String,
-    content: String
-};
+const blogSchema = new mongoose.Schema({
+  title: String,
+  author: String,
+  body: String,
+  date: { type: Date, default: Date.now },
+  meta: {
+    like: Number,
+    dislike: Number,  
+    favs: Number
+  }
+});
 
 const userSchema = new mongoose.Schema({ 
     username: String,
@@ -41,8 +47,7 @@ const userSchema = new mongoose.Schema({
 userSchema.plugin(passportLocalMongoose);
 
 const users  = new mongoose.model("users",userSchema);
-
-const articles = mongoose.model("articels",articleSchema); 
+const articles = mongoose.model("articels",blogSchema); 
 
 passport.use(users.createStrategy());
 
@@ -68,10 +73,10 @@ app.post('/login', function(req,res){
       })
 });
 
-app.post('/register', function(req , res ){
+app.post('/register', async(req , res )=>{
     // check if the passport already exist
     const { username, password } = req.body;
-    const existingUser = users.findOne({ username});
+    const existingUser = await users.findOne({username});
     if (existingUser) {
       return res.status(400).json({ message: 'user already registered' });
     }
@@ -90,37 +95,47 @@ app.post('/register', function(req , res ){
       
 });
 
-
-
-
 app.route("/articels")
 
 .get(function(req ,res ){
-    articles.find().then((articles) => {
-        console.log(articles);
-      
-       })
+    if (req.isAuthenticated()){
+      console.log(req.body);
+      res.send("we'r logged in ");
+    }
+    else{ 
+      res.redirect("/login");
+    }
 })
 
 .post(function(req ,res ){
-    console.log(req.body.title)
-    console.log(req.body.content)
+    if (req.isAuthenticated()){
+      console.log(req.user);
      
-    const newArticle  = new articles (
+      const newArticle  = new articles (
         {
             title : req.body.title,
-            content : req.body.content
+            author : req.body.author,
+            body : req.body.body,
+            date : req.body.Date,
+            like: req.body.like,
+            dislike : req.body.dislike
         }
     );
 
     newArticle.save();
     res.send("new article add ");
+    }
+    else{
+      console.log(("log in first "));
+      //res.redirect("/");
+    }
+    
 
 
-}); 
+})
+.patch(function(req,res){
 
-
-
+});
 
 app.listen(3000, function() {
   console.log("Server started on port 3000");
