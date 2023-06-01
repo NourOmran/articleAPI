@@ -29,15 +29,11 @@ app.use(passport.session());
 mongoose.connect("mongodb://localhost:27017/wikiDB");
 
 const blogSchema = new mongoose.Schema({
-  title: String,
-  author: String,
-  body: String,
+  author : String,
+  body : String,
   date: { type: Date, default: Date.now },
-  meta: {
-    like: Number,
-    dislike: Number,  
-    favs: Number
-  }
+  like : {type : Number, default : 0},
+  dislike : {type : Number , default : 0}
 });
 
 const userSchema = new mongoose.Schema({ 
@@ -109,16 +105,16 @@ app.route("/articels")
 
 .post(function(req ,res ){
     if (req.isAuthenticated()){
-      console.log(req.user);
+      console.log(req.body);
      
       const newArticle  = new articles (
         {
-            title : req.body.title,
-            author : req.body.author,
+            author : req.session.passport.user,
             body : req.body.body,
             date : req.body.Date,
             like: req.body.like,
-            dislike : req.body.dislike
+            dislike: req.body.dislike
+            
         }
     );
 
